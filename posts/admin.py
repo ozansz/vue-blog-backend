@@ -3,8 +3,11 @@ from django.db import models
 from django.forms import TextInput, Textarea
 from django.core import serializers
 from django.http import HttpResponse
+from django.utils.html import format_html
 
 from .models import Post
+from .serializers import PostSerializer
+import json
 
 def action_hide(modeladmin, request, queryset):
     queryset.update(hidden=True)
@@ -36,6 +39,12 @@ def action_remove_force_readonly(modeladmin, request, queryset):
 action_remove_force_readonly.short_description = "Remove force-read-only mark from posts"
 action_remove_force_readonly.is_admin = True
 
+def action_archive(modeladmin, request, queryset):
+    js = json.dumps(PostSerializer(queryset, many=True).data)
+    return HttpResponse(js, content_type="application/json")
+action_archive.short_description = "Download all posts in a json file"
+action_archive.is_admin = False
+
 postadmin_actions = [
     action_hide,
     action_force_hide,
@@ -43,10 +52,14 @@ postadmin_actions = [
     action_remove_hidden,
     action_remove_force_hidden,
     action_remove_force_readonly,
+    action_archive,
 ]
 
 class PostAdmin(admin.ModelAdmin):
-    list_display = ['title', 'author', 'ts']
+    list_display = ['title', 'author', 'ts', 'post_actions']
+
+    def post_actions(self, obj):
+        return format_html("<a target=\"_\" href=\"/api/post/{}/?format=json\">As JSON</a>", obj.id)
 
     def get_fields(self, request, obj=None):
         if request.user.is_superuser:
