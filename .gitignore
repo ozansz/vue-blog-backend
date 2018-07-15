@@ -40,3 +40,7 @@ media
 venv
 posts/migrations/*
 !posts/migrations/__init__.py
+
+static/post_images/*
+!static
+!static/post_images

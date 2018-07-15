@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+from .utils import auto_rename_img
+
 class Post(models.Model):
     author = models.ForeignKey(
         User,
@@ -11,7 +13,10 @@ class Post(models.Model):
     title = models.CharField(max_length=50)
     text = models.TextField()
     use_img = models.BooleanField(default=False)
-    image_url = models.URLField(max_length=200, null=True, blank=True, default=None)
+    image_url = models.URLField(max_length=200, null=True, blank=True,
+                                default=None)
+    image_file = models.FileField(upload_to=auto_rename_img, null=True,
+                                  blank=True, default=None)
     hidden = models.BooleanField(default=False)
     force_hidden = models.BooleanField(default=False)
     force_readonly = models.BooleanField(default=False)
@@ -23,7 +28,7 @@ class Post(models.Model):
         return self.__str__()
 
     def save(self, *args, **kwargs):
-        if self.image_url == None:
+        if (self.image_url == None) and (self.image_file == None):
             self.use_img = False
         else:
             self.use_img = True

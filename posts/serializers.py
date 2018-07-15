@@ -16,6 +16,11 @@ class PostSerializer(serializers.ModelSerializer):
 
     def get_image_url(self, obj):
         if obj.use_img:
-            return obj.image_url
+            if obj.image_file == None:
+                return [obj.image_url]
+            elif obj.image_url == None:
+                return ['/' + obj.image_file.url]
+            else:
+                return [obj.image_url, '/' + obj.image_file.url]
         else:
             return None

@@ -9,10 +9,10 @@ class PostAdmin(admin.ModelAdmin):
 
     def get_fields(self, request, obj=None):
         if request.user.is_superuser:
-            return ['author', 'title', 'text', 'image_url', 'hidden',
-                    'force_hidden', 'force_readonly']
+            return ['author', 'title', 'text', 'image_url', 'image_file',
+                    'hidden', 'force_hidden', 'force_readonly']
         else:
-            return ['title', 'text', 'image_url', 'hidden']
+            return ['title', 'text', 'image_url', 'image_file', 'hidden']
 
     def get_readonly_fields(self, request, obj=None):
         if request.user.is_superuser:
